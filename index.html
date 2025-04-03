@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profil Dentiste</title>
+  <style>
+    :root {
+      --primary: #1e88e5;
+      --background: #f9f9f9;
+      --bot-bg: #ffffff;
+      --user-bg: #e3f2fd;
+      --bot-color: #333;
+      --user-color: #0d47a1;
+      --accent: #2196f3;
+      --rounded: 12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--background);
+    }
+
+    #chatbot-toggle {
+  animation: pulse 2s infinite ease-in-out;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 9999;
+      transition: background 0.3s;
+    }
+    #chatbot-toggle:hover {
+      background-color: #1565c0;
+    }
+
+    #chatbot-container {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 380px;
+      height: 540px;
+      background: white;
+      border-radius: var(--rounded);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 9998;
+    }
+    #chatbot-container.open {
+      display: flex;
+    }
+    #chatbot-header {
+      background-color: var(--primary);
+      color: white;
+      padding: 16px;
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+    }
+    #chatbot-body {
+      flex: 1;
+      padding: 16px;
+      font-size: 15px;
+      overflow-y: auto;
+      background: var(--background);
+    }
+    #chatbot-input {
+      display: flex;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+      background: white;
+    }
+    #chatbot-input input {
+      flex: 1;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: var(--rounded);
+      outline: none;
+    }
+    #chatbot-input button {
+      margin-left: 8px;
+      padding: 10px 14px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--rounded);
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .chat-option {
+      margin: 8px 0;
+      padding: 10px 14px;
+      background: white;
+      border: 1px solid var(--accent);
+      border-radius: var(--rounded);
+      cursor: pointer;
+      color: var(--primary);
+      transition: all 0.3s;
+    }
+    .chat-option:hover {
+      background: var(--primary);
+      color: white;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  @keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.user-message {
+  background: white !important;
+  color: black !important;
+  text-align: right !important;
+  border-radius: 16px 0 16px 16px !important;
+  max-width: 80%;
+  margin-left: auto;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.bot-message {
+  background: var(--primary) !important;
+  color: white !important;
+  text-align: left !important;
+  border-radius: 0 16px 16px 16px !important;
+  max-width: 80%;
+  margin-right: auto;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #e6f7f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding-bottom: 120px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #b2e0db;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin: 10px 0 5px;
+      font-size: 24px;
+      color: #1e7f74;
+    }
+
+    p.speciality {
+      font-size: 16px;
+      color: #5a9c94;
+      margin-bottom: 10px;
+    }
+
+    .info {
+    margin: 10px 0;
+    color: #0f0f0f; /* Couleur plus sombre pour un look professionnel */
+    font-size: 16px; /* Taille de police légèrement augmentée */
+    font-family: 'Roboto', sans-serif; /* Police moderne et professionnelle */
+    line-height: 1.6; /* Espacement entre les lignes pour une meilleure lisibilité */
+  }
+
+  .info strong {
+    font-size: 18px; /* Taille de police plus grande pour les titres */
+    color: #1e7f74; /* Couleur verte pour les titres */
+    font-weight: 600; /* Texte en semi-gras pour les titres */
+  }
+    .btn-rdv {
+      background: #2dc9a5;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 20px;
+    }
+
+    .btn-rdv:hover {
+      background: #25b093;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animated-stars {
+    position: relative;
+    display: inline-block;
+    font-size: 24px; /* Taille des étoiles */
+    color: #ddd; /* Couleur des étoiles non remplies */
+    overflow: hidden;
+  }
+
+  .animated-stars .stars {
+    position: relative;
+    color: #ffcc00; /* Couleur des étoiles remplies */
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline-block;
+    animation: starsFill 2s ease-in-out infinite;
+  }
+
+  @keyframes starsFill {
+    0% {
+      width: 0;
+    }
+    50% {
+      width: 100%;
+    }
+    100% {
+      width: 0;
+    }
+  }
+
+  .btn-share {
+    background: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+
+  .btn-share:hover {
+    background: #e0e0e0;
+    transform: scale(1.05);
+  }
+
+  .btn-share img {
+    transition: transform 0.3s ease;
+  }
+
+  .btn-share:hover img {
+    transform: rotate(15deg);
+  }
+  .btn-save:hover {
+    background: #e0e0e0;
+    transform: scale(1.05);
+  }
+
+  .btn-save img {
+    transition: transform 0.3s ease;
+  }
+
+  .btn-save:hover img {
+    transform: rotate(15deg);
+  }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    
+    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dentiste" class="profile-pic" />
+    <h2>Dr.Yris QUILARQUE</h2>
+    <h2>Orthodontiste </h2>
+     
+    <div class="info">
+      <strong>Adresse</strong><br/>
+      15 rue de l'Atlas 75019 Paris
+    </div>
+    <div class="info">
+      <strong>Horaires</strong><br/>
+      Lundi - Vendredi : 8h - 19h<br/>
+    </div>
+    <div class="info">
+      <a href="https://g.co/kgs/LvYkH1D" style="  font-weight: bold; color: #1e7f74; margin-bottom: 5px;">Donnez votre avis</p>
+      
+        <a href="https://g.co/kgs/LvYkH1D" class="animated-stars" style="text-decoration: none; display: inline-flex; align-items: center;">
+        <span class="stars">★★★★★</span>
+      </a>
+    </div>
+    <button class="btn-rdv" onclick="prendreRDV()">Prendre Rendez-ous</button>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <div style="display: flex; justify-content: center; gap: 10px;">
+        <button class="btn-share" onclick="shareProfile()">
+          <img src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Partager" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;" />
+          <span style="font-size: 14px; font-weight: bold; color: #1e7f74;">Partager</span>
+        </button>
+        <button class="btn-share" onclick="saveProfile()">
+          <img src="https://cdn-icons-png.flaticon.com/512/1828/1828490.png" alt="Enregistrer" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;" />
+          <span style="font-size: 14px; font-weight: bold; color: #1e7f74;">Enregistrer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <script>
+    function shareProfile() {
+      const profileData = {
+        title: "Profil du Dr. Yris Quilarque",
+        text: "Découvrez le profil du Dr. Yris Quilarque, Orthodontiste à Paris. Adresse : 15 rue de l'Atlas 75019 Paris. Horaires : Lundi - Vendredi, 8h - 19h.",
+        url: window.location.href
+      };
+  
+      if (navigator.share) {
+        navigator.share(profileData)
+          .then(() => console.log("Profil partagé avec succès"))
+          .catch((error) => console.error("Erreur lors du partage :", error));
+      } else {
+        alert("Le partage n'est pas pris en charge sur cet appareil.");
+      }
+    }
+  </script>
+ <script>
+  function saveProfile() {
+    const profileData = `
+      Profil du Dr. Yris Quilarque
+      ----------------------------
+      Spécialité : Orthodontiste
+      Adresse : 15 rue de l'Atlas, 75019 Paris
+      Horaires : Lundi - Vendredi, 8h - 19h
+    `;
+
+    const blob = new Blob([profileData], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'profil_dentiste.txt';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+</script>
+  <button id="chatbot-toggle">
+    <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" alt="Logo dent" style="width: 36px; height: 36px; object-fit: contain;" />
+  </button>
+    <div id="chatbot-container">
+      <div id="chatbot-header">
+    <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" alt="Logo dent" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">
+    Assistante Santé+
+  </div>
+      <div id="chatbot-body"></div>
+      <div id="chatbot-input">
+        <input type="text" id="user-input" placeholder="Écrivez votre message...">
+        <button id="send-btn">Envoyer</button>
+      </div>
+    </div>
+    <script>
+      const toggleBtn = document.getElementById('chatbot-toggle');
+      const chatbotContainer = document.getElementById('chatbot-container');
+      const chatbotBody = document.getElementById('chatbot-body');
+      const sendBtn = document.getElementById('send-btn');
+      const userInput = document.getElementById('user-input');
+  
+      toggleBtn.addEventListener('click', () => {
+        chatbotContainer.classList.toggle('open');
+      });
+  
+      function addUserMessage(msg) {
+    const userMsg = document.createElement('div');
+    userMsg.className = 'chat-option user-message';
+    userMsg.style.background = 'white';
+    userMsg.style.color = 'black';
+    userMsg.style.textAlign = 'right';
+    userMsg.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/4333/4333609.png" alt="Patient" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 6px; border-radius: 50%;"> <strong>Vous :</strong><br>' + msg;
+    chatbotBody.appendChild(userMsg);
+    userMsg.style.animation = 'fadeIn 0.4s ease';
+    playSound();
+    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+  }
+  
+      function addBotMessage(msg) {
+    const botMsg = document.createElement('div');
+    botMsg.className = 'chat-option bot-message';
+    botMsg.style.background = 'var(--primary)';
+    botMsg.style.color = 'white';
+    botMsg.style.textAlign = 'left';
+    botMsg.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" alt="Chatbot" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 6px;"> <strong>Assistante Santé+ :</strong><br>' + msg;
+    chatbotBody.appendChild(botMsg);
+    botMsg.style.animation = 'fadeIn 0.4s ease';
+    playSound();
+    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+  }
+  
+      function handleUserInput() {
+        const text = userInput.value.trim();
+        if (!text) return;
+        addUserMessage(text);
+        userInput.value = '';
+  
+        const corrected = text.toLowerCase();
+  
+        if (corrected.includes('rendez-vous') || corrected.includes('rdv') || corrected.includes('réserver') || corrected.includes('reservation') || corrected.includes('prise de rendez-vous') || corrected.includes('prendre rdv') || corrected.includes('doctolib')) {
+          window.open('https://www.doctolib.fr/orthodontiste/paris/deleted-deleted-cd92d356-f836-49e9-8c44-770766180c6a/booking/motives?specialityId=270&telehealth=false&placeId=practice-654747&bookingFunnelSource=profile', '_blank');
+          return;
+        }
+  
+        if (corrected.includes('tarifs') || corrected.includes('remboursement') || corrected.includes('prix') || corrected.includes('mutuelle') || corrected.includes('montant') || corrected.includes('coût') || corrected.includes('honoraires') || corrected.includes('facture') || corrected.includes('prix consultation') || corrected.includes('remboursé') || corrected.includes('sécu')) {
+          addBotMessage("✔️ Conventionné<br>✔️ Carte Vitale acceptée<br>✔️ Tiers payant : Sécurité sociale");
+          return;
+        }
+  
+        if (corrected.includes('cb') || corrected.includes('carte') || corrected.includes('bleue') || corrected.includes('paiement') || corrected.includes('payer') || corrected.includes('mode de règlement') || corrected.includes('paiement carte') || corrected.includes('payer par chèque')) {
+          addBotMessage("💳 Moyens de paiement acceptés :<br>• Chèques<br>• Espèces<br>• Carte Bleue");
+          return;
+        }
+  
+        if (corrected.includes('expertises') || corrected.includes('actes') || corrected.includes('soins') || corrected.includes('prestations') || corrected.includes('services') || corrected.includes('traitements')) {
+          addBotMessage("🧪 Nos expertises incluent :<br>• Alignement dentaire invisible<br>• Apnée du sommeil<br>• Appareil dentaire<br>• Blanchiment des dents<br>• Chirurgie maxillo-faciale et stomatologie<br>• Cône beam<br>• Dysfonctionnement temporo-mandibulaire (DTM)<br>• Injection d'acide hyaluronique<br>• Orthopédie dento-maxillo-faciale<br>• Radio panoramique<br>• Radiographie dentaire");
+          return;
+        }
+  
+        if (corrected.includes('chèques') || corrected.includes('cheques') || corrected.includes('espèces') || corrected.includes('especes') || corrected.includes('carte bleue') || corrected.includes('carte bleu')) {
+          addBotMessage("💳 Moyens de paiement acceptés :<br>• Chèques<br>• Espèces<br>• Carte Bleue");
+          return;
+        }
+  
+        addBotMessage("Je suis désolée, je n'ai pas compris. Pouvez-vous reformuler ?");
+      }
+  
+      sendBtn.addEventListener('click', handleUserInput);
+      userInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') handleUserInput();
+      });
+  
+      const quickQuestions = [
+        "📅 Prendre un rendez-vous",
+        "🧪 Expertises et actes",
+        "💰 Tarifs et remboursement",
+        "💳 Moyens de paiement"
+      ];
+  
+      quickQuestions.forEach(q => {
+        const quick = document.createElement('div');
+        quick.className = 'chat-option';
+        quick.innerText = q;
+        quick.onclick = () => {
+          userInput.value = q;
+          handleUserInput();
+        };
+        chatbotBody.appendChild(quick);
+      });
+    const audio = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_7abf3d59c6.mp3");
+  
+  function playSound() {
+    audio.currentTime = 0;
+    audio.play();
+  }
+  </script>
+
+  <audio id="chatOpenSound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3" preload="auto"></audio>
+
+  <script>
+    function prendreRDV() {
+      window.location.href = "https://www.doctolib.fr/orthodontiste/paris/deleted-deleted-cd92d356-f836-49e9-8c44-770766180c6a/booking/motives?specialityId=270&telehealth=false&placeId=practice-654747&bookingFunnelSource=profile";
+    }
+  </script>
+
+  
+
+</body>
+</html>
