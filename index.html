@@ -322,18 +322,19 @@
       </a>
     </div>
     <!-- <button class="btn-rdv" onclick="prendreRDV()">Prendre Rendez-ous</button> -->
-    <button class="btn-rdv" onclick="gtag('event', 'click_rdv', { event_category: 'interaction', event_label: 'Prise RDV Doctolib' }); prendreRDV()">Prendre Rendez-vous</button>
+    <!-- <button class="btn-rdv" onclick="gtag('event', 'click_rdv', { event_category: 'interaction', event_label: 'Prise RDV Doctolib' }); prendreRDV()">Prendre Rendez-vous</button> -->
+    <button class="btn-rdv" onclick="trackFirebaseClick('clics_rdv'); gtag('event', 'click_rdv', { event_category: 'interaction', event_label: 'Prise RDV Doctolib' }); prendreRDV()">Prendre Rendez-vous</button>
 
     <div style="text-align: center; margin-top: 20px;">
       <div style="display: flex; justify-content: center; gap: 10px;">
         <!-- <button class="btn-share" onclick="shareProfile()"> -->
-          <button class="btn-share" onclick="gtag('event', 'click_share', { event_category: 'interaction', event_label: 'Partager profil' }); shareProfile()">
+          <button class="btn-share" onclick="trackFirebaseClick('clics_share'); gtag('event', 'click_share', { event_category: 'interaction', event_label: 'Partager profil' }); shareProfile()">
 
           <img src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Partager" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;" />
           <span style="font-size: 14px; font-weight: bold; color: #1e7f74;">Partager</span>
         </button>
         <!-- <button class="btn-share" onclick="saveProfile()"> -->
-          <button class="btn-share" onclick="gtag('event', 'click_save', { event_category: 'interaction', event_label: 'Enregistrer profil' }); saveProfile()">
+          <button class="btn-share" onclick="trackFirebaseClick('clics_save'); gtag('event', 'click_save', { event_category: 'interaction', event_label: 'Enregistrer profil' }); saveProfile()">
 
           <img src="https://cdn-icons-png.flaticon.com/512/1828/1828490.png" alt="Enregistrer" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;" />
           <span style="font-size: 14px; font-weight: bold; color: #1e7f74;">Enregistrer</span>
@@ -503,6 +504,36 @@
       window.location.href = "https://www.doctolib.fr/orthodontiste/paris/deleted-deleted-cd92d356-f836-49e9-8c44-770766180c6a/booking/motives?specialityId=270&telehealth=false&placeId=practice-654747&bookingFunnelSource=profile";
     }
   </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { getFirestore, doc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD1rxrOqujyTehBCmTXf3ey9ZV_2AlO5jQ",
+    authDomain: "dentiste-6f7e0.firebaseapp.com",
+    projectId: "dentiste-6f7e0",
+    storageBucket: "dentiste-6f7e0.firebasestorage.app",
+    messagingSenderId: "1049364021560",
+    appId: "1:1049364021560:web:8bc62eceeee8b800fdc1cd",
+    measurementId: "G-GVZKX3XCPP"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const docRef = doc(db, "stats", "carte-yris");
+  updateDoc(docRef, {
+    vues: increment(1)
+  }).catch(async () => {
+    await setDoc(docRef, { vues: 1, clics_rdv: 0, clics_share: 0, clics_save: 0 });
+  });
+
+  window.trackFirebaseClick = function(action) {
+    const updates = {};
+    updates[action] = increment(1);
+    updateDoc(docRef, updates);
+  };
+</script>
 
   
 
