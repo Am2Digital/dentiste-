@@ -291,6 +291,13 @@
   a{text-decoration: none;}
   </style>
 </head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ABCDEFG123"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9P2JD2J5C9');
+</script>
 <body>
 
   <div class="card">
@@ -314,18 +321,24 @@
         <span class="stars">★★★★★</span>
       </a>
     </div>
-    <button class="btn-rdv" onclick="prendreRDV()">Prendre Rendez-ous</button>
-    
+    <!-- <button class="btn-rdv" onclick="prendreRDV()">Prendre Rendez-ous</button> -->
+    <button class="btn-rdv" onclick="gtag('event', 'click_rdv', { event_category: 'interaction', event_label: 'Prise RDV Doctolib' }); prendreRDV()">Prendre Rendez-vous</button>
+
     <div style="text-align: center; margin-top: 20px;">
       <div style="display: flex; justify-content: center; gap: 10px;">
-        <button class="btn-share" onclick="shareProfile()">
+        <!-- <button class="btn-share" onclick="shareProfile()"> -->
+          <button class="btn-share" onclick="gtag('event', 'click_share', { event_category: 'interaction', event_label: 'Partager profil' }); shareProfile()">
+
           <img src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Partager" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;" />
           <span style="font-size: 14px; font-weight: bold; color: #1e7f74;">Partager</span>
         </button>
-        <button class="btn-share" onclick="saveProfile()">
+        <!-- <button class="btn-share" onclick="saveProfile()"> -->
+          <button class="btn-share" onclick="gtag('event', 'click_save', { event_category: 'interaction', event_label: 'Enregistrer profil' }); saveProfile()">
+
           <img src="https://cdn-icons-png.flaticon.com/512/1828/1828490.png" alt="Enregistrer" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;" />
           <span style="font-size: 14px; font-weight: bold; color: #1e7f74;">Enregistrer</span>
         </button>
+        
       </div>
      <a href="https://am2digital.github.io/VISITEAHMED/"><p>Réalisé par Am2.tech</p></a>
     </div>
@@ -495,3 +508,4 @@
 
 </body>
 </html>
+
