@@ -1,7 +1,7 @@
 {
   "name": "Dashboard Praticien",
   "short_name": "Dashboard",
-  "start_url": "./index.html",
+  "start_url": "./dashboard.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1e88e5",
