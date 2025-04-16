@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Praticien Complet</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f6f8; padding: 40px; margin: 0; }
+    .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h2 { color: #1e88e5; margin-top: 40px; }
+    input, button, textarea {
+      width: 100%; padding: 10px; margin: 10px 0; font-size: 16px;
+      border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;
+    }
+    button { background-color: #1e88e5; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #1565c0; }
+    #dashboard, #edit-section, #generator-section, #stats-section { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔐 Connexion par code</h2>
+    <input type="text" id="access-code" placeholder="Code à 6 chiffres" maxlength="6">
+    <button onclick="connecter()">Se connecter</button>
+
+    <div id="dashboard">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+        <button onclick="toggleSection('stats')">📊 Voir les statistiques</button>
+        <button onclick="toggleSection('edit')">📝 Modifier le profil</button>
+        <button onclick="toggleSection('redirect')">🔁 Générer un lien court</button>
+      </div>
+      <h2><span id="carte-id"></span></h2>
+
+      <div id="stats-section">
+        <h2>📊 Statistiques</h2>
+        <canvas id="statsChart"></canvas>
+        <p><strong>Vues :</strong> <span id="vues"></span> | <strong>RDV :</strong> <span id="clics-rdv"></span> | <strong>Partages :</strong> <span id="clics-share"></span> | <strong>Sauvegardes :</strong> <span id="clics-save"></span></p>
+      </div>
+
+      <div id="edit-section">
+        <h2>📝 Modifier le profil</h2>
+        <input type="text" id="nom" placeholder="Nom">
+        <input type="text" id="specialite" placeholder="Spécialité">
+        <input type="text" id="adresse" placeholder="Adresse">
+        <input type="text" id="horaires" placeholder="Horaires">
+        <input type="text" id="telephone" placeholder="Téléphone">
+        <input type="text" id="photo" placeholder="URL de la photo">
+        <button onclick="saveInfos()">Enregistrer</button>
+        <div id="save-toast" style="display:none; color: green; text-align:center; margin-top: 10px;">✅ Infos enregistrées</div>
+      </div>
+
+      <div id="generator-section">
+        <h2>🔁 Générateur de Redirection</h2>
+        <input type="text" id="redirect-nom" placeholder="Nom court (ex: yris)" />
+        <input type="text" id="redirect-id" placeholder="ID Firestore (ex: carte-yris)" />
+        <button onclick="genererRedirection()">Générer le fichier HTML</button>
+        <textarea id="redirect-output" readonly style="height: 160px;"></textarea>
+      </div>
+
+      <button onclick="logout()" style="margin-top: 20px">Se déconnecter</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD1rxrOqujyTehBCmTXf3ey9ZV_2AlO5jQ",
+      authDomain: "dentiste-6f7e0.firebaseapp.com",
+      projectId: "dentiste-6f7e0",
+      storageBucket: "dentiste-6f7e0.firebasestorage.app",
+      messagingSenderId: "1049364021560",
+      appId: "1:1049364021560:web:8bc62eceeee8b800fdc1cd"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    let statsChart;
+
+    function connecter() {
+      const code = document.getElementById("access-code").value.trim();
+      if (!code) return;
+      db.collection("codes").doc(code).get().then(docSnap => {
+        if (!docSnap.exists) return alert("Code invalide");
+        const id = docSnap.data().id;
+        document.getElementById("carte-id").textContent = id;
+        document.getElementById("dashboard").style.display = "block";
+        toggleSection('stats');
+        loadStats(id);
+        loadInfos(id);
+      });
+    }
+
+    function logout() {
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("access-code").value = "";
+    }
+
+    function toggleSection(section) {
+      document.getElementById("edit-section").style.display = section === 'edit' ? "block" : "none";
+      document.getElementById("generator-section").style.display = section === 'redirect' ? "block" : "none";
+      document.getElementById("stats-section").style.display = section === 'stats' ? "block" : "none";
+    }
+
+    function loadStats(id) {
+      db.collection("stats").doc(id).get().then(snap => {
+        if (!snap.exists) return;
+        const data = snap.data();
+        document.getElementById("vues").textContent = data.vues ?? 0;
+        document.getElementById("clics-rdv").textContent = data.clics_rdv ?? 0;
+        document.getElementById("clics-share").textContent = data.clics_share ?? 0;
+        document.getElementById("clics-save").textContent = data.clics_save ?? 0;
+
+        const ctx = document.getElementById("statsChart").getContext("2d");
+        if (statsChart) statsChart.destroy();
+        statsChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Vues', 'Clics RDV', 'Partages', 'Sauvegardes'],
+            datasets: [{
+              label: 'Interactions',
+              data: [data.vues, data.clics_rdv, data.clics_share, data.clics_save],
+              backgroundColor: ['#1e88e5', '#43a047', '#fbc02d', '#8e24aa']
+            }]
+          },
+          options: { responsive: true }
+        });
+      });
+    }
+
+    function loadInfos(id) {
+      db.collection("profils").doc(id).get().then(snap => {
+        if (!snap.exists) return;
+        const data = snap.data();
+        ["nom", "specialite", "adresse", "horaires", "telephone", "photo"].forEach(key => {
+          document.getElementById(key).value = data[key] || "";
+        });
+      });
+    }
+
+    function saveInfos() {
+      const id = document.getElementById("carte-id").textContent;
+      const infos = {
+        nom: document.getElementById("nom").value,
+        specialite: document.getElementById("specialite").value,
+        adresse: document.getElementById("adresse").value,
+        horaires: document.getElementById("horaires").value,
+        telephone: document.getElementById("telephone").value,
+        photo: document.getElementById("photo").value
+      };
+      db.collection("profils").doc(id).set(infos).then(() => {
+        document.getElementById("save-toast").style.display = "block";
+        setTimeout(() => document.getElementById("save-toast").style.display = "none", 3000);
+      });
+    }
+
+    function genererRedirection() {
+  const nom = document.getElementById('redirect-nom').value.trim();
+  const id = document.getElementById('redirect-id').value.trim();
+  if (!nom || !id) return alert("Champs manquants");
+
+  const html = '<!DOCTYPE html>\n' +
+  '<html>\n' +
+  '  <head>\n' +
+  `    <meta http-equiv="refresh" content="0;url=/fiche.html?id=${id}">\n` +
+  '    <meta charset="UTF-8">\n' +
+  `    <title>Redirection ${nom}</title>\n` +
+  '  </head>\n' +
+  '  <body>\n' +
+  `    <p>Redirection... <a href="/fiche.html?id=${id}">Cliquez ici</a></p>\n` +
+  '  <\\/body>\n' +  // protégé
+  '<\\/html>';       // protégé
+
+document.getElementById("redirect-output").value = html;
+}
+  </script>
+</body>
+</html>
