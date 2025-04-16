@@ -4,7 +4,7 @@ self.addEventListener("install", (event) => {
     caches.open("dashboard-cache-v1").then((cache) => {
       return cache.addAll([
         "./",
-        "./index.html",
+        ".dashboard.html",
         "./manifest.json",
         "./sw.js",
         "https://cdn.jsdelivr.net/npm/chart.js", // externe
