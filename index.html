@@ -5,6 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profil Dentiste</title>
   <style>
+
+@media screen and (max-width: 480px) {
+  #chatbot-container {
+    width: 90vw;
+    height: 90vh;
+    bottom: 80px;
+    right: 5vw;
+    border-radius: 16px;
+  }
+
+  #chatbot-input input {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  #chatbot-input button {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  #chatbot-body {
+    padding: 12px;
+  }
+
+  #chatbot-header {
+    font-size: 18px;
+    padding: 14px;
+  }
+
+  #chatbot-toggle {
+    bottom: 15px;
+    right: 15px;
+    width: 52px;
+    height: 52px;
+  }
+
+  #chatbot-toggle img {
+    width: 28px;
+    height: 28px;
+  }
+}
+
     :root {
       --primary: #1e88e5;
       --background: #f9f9f9;
@@ -30,7 +72,83 @@
       right: 20px;
       background-color: var(--primary);
       color: white;
-      border: none;
+      border: none;      #chatbot-toggle {
+        animation: pulse 2s infinite ease-in-out;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        z-index: 9999;
+        transition: background 0.3s;
+      }
+      #chatbot-toggle:hover {
+        background-color: #1565c0;
+      }
+      
+      #chatbot-container {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 380px;
+        height: 540px;
+        background: white;
+        border-radius: var(--rounded);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 9998;
+      }
+      #chatbot-container.open {
+        display: flex;
+      }
+      #chatbot-header {
+        background-color: var(--primary);
+        color: white;
+        padding: 16px;
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+      }
+      #chatbot-body {
+        flex: 1;
+        padding: 16px;
+        font-size: 15px;
+        overflow-y: auto;
+        background: var(--background);
+      }
+      #chatbot-input {
+        display: flex;
+        border-top: 1px solid #ddd;
+        padding: 10px;
+        background: white;
+      }
+      #chatbot-input input {
+        flex: 1;
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: var(--rounded);
+        outline: none;
+      }
+      #chatbot-input button {
+        margin-left: 8px;
+        padding: 10px 14px;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--rounded);
+        font-weight: bold;
+        cursor: pointer;
+      }
       border-radius: 50%;
       width: 60px;
       height: 60px;
@@ -289,6 +407,8 @@
   }
 
   a{text-decoration: none;}
+
+ .info{text-decoration: none;}
   </style>
 </head>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ABCDEFG123"></script>
@@ -308,8 +428,10 @@
      
     <div class="info">
       <strong>Adresse</strong><br/>
-      15 rue de l'Atlas 75019 Paris
+      15 rue de l'Atlas, 75019 Paris<br/>
+      <a href="https://www.google.com/maps?q=15+rue+de+l'Atlas,+75019+Paris" target="_blank" style="color: #1e7f74; font-weight: bold; text-decoration: none;">📍 Voir sur la carte</a>
     </div>
+  
     <div class="info">
       <strong>Horaires</strong><br/>
       Lundi - Vendredi : 8h - 19h<br/>
@@ -343,6 +465,8 @@
       </div>
      <a href="https://am2digital.github.io/VISITEAHMED/"><p>Réalisé par Am2.tech</p></a>
     </div>
+   
+    
     
   </div>
   <script>
@@ -506,7 +630,7 @@
   </script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-  import { getFirestore, doc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyD1rxrOqujyTehBCmTXf3ey9ZV_2AlO5jQ",
@@ -518,16 +642,32 @@
     measurementId: "G-GVZKX3XCPP"
   };
 
+  // Initialisation
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const docRef = doc(db, "stats", "carte-yris");
+  // 🔍 Récupération de l'ID depuis l'URL
+  const params = new URLSearchParams(window.location.search);
+  const uid = params.get("id") || "inconnu"; // fallback si pas d'id
+  const docRef = doc(db, "stats", uid);
+
+  // 🔄 Incrément des vues
   updateDoc(docRef, {
-    vues: increment(1)
+    vues: increment(1),
+    last_url: window.location.href,
+    last_visit: new Date()
   }).catch(async () => {
-    await setDoc(docRef, { vues: 1, clics_rdv: 0, clics_share: 0, clics_save: 0 });
+    await setDoc(docRef, {
+      vues: 1,
+      clics_rdv: 0,
+      clics_share: 0,
+      clics_save: 0,
+      created_at: new Date(),
+      first_url: window.location.href
+    });
   });
 
+  // 🎯 Pour enregistrer les clics via bouton
   window.trackFirebaseClick = function(action) {
     const updates = {};
     updates[action] = increment(1);
